@@ -22,6 +22,7 @@ bot = commands.Bot(command_prefix=config['bot']['prefix'], intents=intents)
 BATMAN_QUOTES = config['quotes']
 SOUND_EFFECTS = config['sounds']
 BATMAN_FACTS = config['facts']
+PATHS = config['paths']
 
 @bot.event
 async def on_ready():
@@ -57,6 +58,9 @@ FFMPEG_PATH = 'C:\\ProgramData\\chocolatey\\bin\\ffmpeg.exe'
 @bot.command(name='batsound')
 async def play_sound(ctx, sound_name: str = None):
     """Plays a Batman-related sound effect"""
+
+    #TODO add random config
+
     if not sound_name:
         await ctx.send("Available sounds: " + ", ".join(SOUND_EFFECTS.keys()))
         return
@@ -73,7 +77,7 @@ async def play_sound(ctx, sound_name: str = None):
         voice_channel = ctx.author.voice.channel
         voice_client = await voice_channel.connect()
         
-        sound_path = os.path.abspath(SOUND_EFFECTS[sound_name])
+        sound_path = os.path.abspath(PATHS['main_path'] + SOUND_EFFECTS[sound_name])
         print(f"Attempting to play: {sound_path}")
         
         # Verify file exists
@@ -81,15 +85,11 @@ async def play_sound(ctx, sound_name: str = None):
             await ctx.send(f"Error: Sound file not found at {sound_path}")
             return
             
-        # Try to convert the file first to ensure compatibility
-        temp_file = f"temp_{sound_name}.mp3"
-        convert_command = f'"{FFMPEG_PATH}" -i "{sound_path}" -ar 48000 -ac 2 -b:a 192k "{temp_file}"'
-        os.system(convert_command)
         
-        if os.path.exists(temp_file):
+        if os.path.exists(sound_path):
             voice_client.play(discord.FFmpegPCMAudio(
                 executable=FFMPEG_PATH,
-                source=temp_file
+                source=sound_path
             ))
             await ctx.send(f"Playing sound: {sound_name}")
             
@@ -97,11 +97,6 @@ async def play_sound(ctx, sound_name: str = None):
             while voice_client.is_playing():
                 await asyncio.sleep(1)
             
-            # Clean up
-            try:
-                os.remove(temp_file)
-            except:
-                pass
                 
         else:
             await ctx.send("Error converting sound file")

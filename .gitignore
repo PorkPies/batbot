@@ -2,3 +2,5 @@
 *.txt
 *.env
 test_tone.mp3
+*pycache
+*pyc
