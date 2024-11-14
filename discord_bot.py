@@ -5,6 +5,7 @@ import os
 import asyncio
 import yaml
 from datetime import datetime
+import json
 
 def load_config():
     with open('config.yaml', 'r') as file:
@@ -47,11 +48,26 @@ async def help_command(ctx):
     🦇 **Batman Bot Commands** 🦇
     `!batquote` - Get a random Batman quote
     `!batsound [sound_name]` - Play a Batman sound effect
+    `!batsound random` - Play a random sound effect
     `!batfact` - Learn a random Batman fact
+    `!batlist` - Show all available sounds
     `!bathelp` - Show this help message
     """
     await ctx.send(commands_list)
 
+@bot.command(name='batlist')
+async def show_sounds(ctx):
+    """Shows all available sounds"""
+    sounds = SOUND_EFFECTS.keys()
+    text = ""
+    for sound in sounds:
+        text += str(sound)
+        text += '\n'
+    commands_list = f"""
+    🦇 **Batman Bot Sounds** 🦇
+    {text}
+    """
+    await ctx.send(commands_list)
 
 FFMPEG_PATH = 'C:\\ProgramData\\chocolatey\\bin\\ffmpeg.exe'
 
@@ -59,12 +75,13 @@ FFMPEG_PATH = 'C:\\ProgramData\\chocolatey\\bin\\ffmpeg.exe'
 async def play_sound(ctx, sound_name: str = None):
     """Plays a Batman-related sound effect"""
 
-    #TODO add random config
-
     if not sound_name:
         await ctx.send("Available sounds: " + ", ".join(SOUND_EFFECTS.keys()))
         return
-        
+
+    if sound_name == 'random':
+        sound_name = random.choice(list(SOUND_EFFECTS.items()))[0]
+
     if sound_name not in SOUND_EFFECTS:
         await ctx.send("Sound not found! Use !batsound to see available sounds.")
         return
