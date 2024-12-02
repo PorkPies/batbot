@@ -8,7 +8,7 @@ from datetime import datetime
 import json
 
 def load_config():
-    with open('config.yaml', 'r') as file:
+    with open('/config.yaml', 'r') as file:
         return yaml.safe_load(file)
 
 # Load configuration
@@ -137,6 +137,11 @@ async def check_sounds(ctx):
         results.append(f"{name}: {'✅' if exists else '❌'} ({abs_path})")
     
     await ctx.send("Sound File Status:\n" + "\n".join(results))
+
+#TODO where is she
+#TODO alfred bot
+
+
 
 if __name__ == "__main__":
 
